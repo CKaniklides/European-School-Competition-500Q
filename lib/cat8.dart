@@ -1,3 +1,6 @@
+import 'dart:async';
+
+import 'package:european_school_competition_ck/helpers.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -693,16 +696,31 @@ class _cat8questionpageState extends State<cat8questionpage> {
   var _totalScore = 0;
   int seconds = 10;
   bool isCorrect = false;
+  int randnum;
+  String currentAnswerSelect;
 
-//  int randnum = 0;
+  @override
+  void initState() {
+    randnum = Random().nextInt(questions.length);
+    super.initState();
+  }
 
-  void _answerQuestion(int score) {
+  void _answerQuestion(dynamic answer) {
+    int score = answer['score'];
     _totalScore = _totalScore + score;
 
     setState(() {
-      _qnum = _qnum + 1;
-      _countnum = _countnum + 1;
-//      randnum = randnum + 1;
+      currentAnswerSelect = answer['text'];
+    });
+
+    Timer(Duration(seconds: 1), () {
+      if (this.mounted)
+        setState(() {
+          _countnum = _countnum + 1;
+          _qnum = _qnum + 1;
+          randnum = Random().nextInt(questions.length);
+          currentAnswerSelect = null;
+        });
     });
 
 //    print(_qnum);  //test
@@ -728,8 +746,6 @@ class _cat8questionpageState extends State<cat8questionpage> {
 
   @override
   Widget build(BuildContext context) {
-    int randnum;
-    randnum = Random().nextInt(46);
     SystemChrome.setPreferredOrientations(
         [DeviceOrientation.portraitDown, DeviceOrientation.portraitUp]);
     return MaterialApp(
@@ -790,7 +806,7 @@ class _cat8questionpageState extends State<cat8questionpage> {
                                     questions[randnum]['questionText'],
                                     style: new TextStyle(
                                       color: Colors.black,
-                                      fontSize: 28.0,
+                                      fontSize: getRelativeSize(context, 5.5),
                                       fontWeight: FontWeight.bold,
                                     ),
                                     textAlign: TextAlign.center,
@@ -803,16 +819,32 @@ class _cat8questionpageState extends State<cat8questionpage> {
                       ),
                     ],
                   ),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      ...(questions[randnum]['answers']
-                              as List<Map<String, Object>>)
-                          .map((answer) {
-                        return Answer(() => _answerQuestion(answer['score']),
-                            answer['text']);
-                      }).toList()
-                    ],
+                  Padding(
+                    padding: const EdgeInsets.all(10.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        ...(questions[randnum]['answers']
+                                as List<Map<String, Object>>)
+                            .map((answer) {
+                          return Answer(
+                            currentAnswerSelect == null
+                                ? () => _answerQuestion(answer)
+                                : null,
+                            answer['text'],
+                            color: currentAnswerSelect == null
+                                ? null
+                                : answer['text'] == currentAnswerSelect
+                                    ? (answer['score'] as int) > 0
+                                        ? Colors.greenAccent[400]
+                                        : Colors.redAccent[100]
+                                    : (answer['score'] as int) > 0
+                                        ? Colors.greenAccent[400]
+                                        : Colors.amberAccent[100],
+                          );
+                        }).toList()
+                      ],
+                    ),
                   ),
                 ],
               ),
@@ -826,7 +858,7 @@ class _cat8questionpageState extends State<cat8questionpage> {
                     '$resultPhrase',
                     style: TextStyle(
                       color: Colors.white,
-                      fontSize: 44.0,
+                      fontSize: getRelativeSize(context, 12.5),
                       fontWeight: FontWeight.bold,
                     ),
                     textAlign: TextAlign.center,
@@ -835,7 +867,7 @@ class _cat8questionpageState extends State<cat8questionpage> {
                     'Total score: $_totalScore/100',
                     style: TextStyle(
                       color: Colors.white,
-                      fontSize: 36.0,
+                      fontSize: getRelativeSize(context, 11.5),
                       fontWeight: FontWeight.bold,
                     ),
                     textAlign: TextAlign.center,
@@ -857,10 +889,10 @@ class _cat8questionpageState extends State<cat8questionpage> {
                               );
                             },
                             child: Text(
-                              'Play Again',
+                              'Play again',
                               style: new TextStyle(
                                   color: Colors.black,
-                                  fontSize: 40.0,
+                                  fontSize: getRelativeSize(context, 12),
                                   fontWeight: FontWeight.bold),
                             ),
                             color: Colors.amberAccent,
@@ -886,10 +918,10 @@ class _cat8questionpageState extends State<cat8questionpage> {
                               );
                             },
                             child: Text(
-                              'Main Menu',
+                              'Main menu',
                               style: new TextStyle(
                                   color: Colors.black,
-                                  fontSize: 40.0,
+                                  fontSize: getRelativeSize(context, 12),
                                   fontWeight: FontWeight.bold),
                             ),
                             color: Colors.amberAccent,

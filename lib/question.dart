@@ -1,3 +1,6 @@
+import 'dart:async';
+
+import 'package:european_school_competition_ck/helpers.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -4741,7 +4744,7 @@ class _questionpageState extends State<questionpage> {
 //8.349
     {
       'questionText':
-          'Η εποπτεία της αγοράς για τον έλεγχο της εφαρμογής των κανόνων σχετικά με την ασφάλεια των προϊόντων και υπηρεσιών εντός της ΕΕ είναι αρμοδιότητα:',
+          'Η εποπτεία της αγοράς για τον έλ������������γχο της εφαρ��������������ογής των κανόνων σχετικά με την ασφάλεια των προϊόντων και υπηρεσιών εντός της ΕΕ είναι αρμοδιότητα:',
       'answers': [
         {'text': 'Του Ευρωπαϊκού Κοινοβουλίου', 'score': 0},
         {
@@ -6283,8 +6286,8 @@ class _questionpageState extends State<questionpage> {
       'questionText':
           'Ποιας χώρας οι πολίτες ανησυχούν περισσότερο για την οικονομική κατάσταση;',
       'answers': [
-        {'text': 'Της Κύπρου', 'score': 0},
-        {'text': 'Της Γερμανίας', 'score': 0},
+        {'text': 'Της Κύ��ρο��', 'score': 0},
+        {'text': 'Της Γ��ρμ��νί��ς', 'score': 0},
         {'text': 'Της Ελλάδας', 'score': 10},
         {'text': 'Της Πολωνίας', 'score': 0},
       ],
@@ -6651,16 +6654,31 @@ class _questionpageState extends State<questionpage> {
   var _totalScore = 0;
   int seconds = 10;
   bool isCorrect = false;
+  int randnum;
+  String currentAnswerSelect;
 
-//  int randnum = 0;
+  @override
+  void initState() {
+    randnum = Random().nextInt(questions.length);
+    super.initState();
+  }
 
-  void _answerQuestion(int score) {
+  void _answerQuestion(dynamic answer) {
+    int score = answer['score'];
     _totalScore = _totalScore + score;
 
     setState(() {
-      _qnum = _qnum + 1;
-      _countnum = _countnum + 1;
-//      randnum = randnum + 1;
+      currentAnswerSelect = answer['text'];
+    });
+
+    Timer(Duration(seconds: 1), () {
+      if (this.mounted)
+        setState(() {
+          _countnum = _countnum + 1;
+          _qnum = _qnum + 1;
+          randnum = Random().nextInt(questions.length);
+          currentAnswerSelect = null;
+        });
     });
 
 //    print(_qnum);  //test
@@ -6686,8 +6704,6 @@ class _questionpageState extends State<questionpage> {
 
   @override
   Widget build(BuildContext context) {
-    int randnum;
-    randnum = Random().nextInt(100);
     SystemChrome.setPreferredOrientations(
         [DeviceOrientation.portraitDown, DeviceOrientation.portraitUp]);
     return MaterialApp(
@@ -6748,7 +6764,7 @@ class _questionpageState extends State<questionpage> {
                                     questions[randnum]['questionText'],
                                     style: new TextStyle(
                                       color: Colors.black,
-                                      fontSize: 28.0,
+                                      fontSize: getRelativeSize(context, 5.5),
                                       fontWeight: FontWeight.bold,
                                     ),
                                     textAlign: TextAlign.center,
@@ -6761,16 +6777,32 @@ class _questionpageState extends State<questionpage> {
                       ),
                     ],
                   ),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      ...(questions[randnum]['answers']
-                              as List<Map<String, Object>>)
-                          .map((answer) {
-                        return Answer(() => _answerQuestion(answer['score']),
-                            answer['text']);
-                      }).toList()
-                    ],
+                  Padding(
+                    padding: const EdgeInsets.all(10.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        ...(questions[randnum]['answers']
+                                as List<Map<String, Object>>)
+                            .map((answer) {
+                          return Answer(
+                            currentAnswerSelect == null
+                                ? () => _answerQuestion(answer)
+                                : null,
+                            answer['text'],
+                            color: currentAnswerSelect == null
+                                ? null
+                                : answer['text'] == currentAnswerSelect
+                                    ? (answer['score'] as int) > 0
+                                        ? Colors.greenAccent[400]
+                                        : Colors.redAccent[100]
+                                    : (answer['score'] as int) > 0
+                                        ? Colors.greenAccent[400]
+                                        : Colors.amberAccent[100],
+                          );
+                        }).toList()
+                      ],
+                    ),
                   ),
                 ],
               ),
@@ -6784,7 +6816,7 @@ class _questionpageState extends State<questionpage> {
                     '$resultPhrase',
                     style: TextStyle(
                       color: Colors.white,
-                      fontSize: 44.0,
+                      fontSize: getRelativeSize(context, 12.5),
                       fontWeight: FontWeight.bold,
                     ),
                     textAlign: TextAlign.center,
@@ -6793,7 +6825,7 @@ class _questionpageState extends State<questionpage> {
                     'Total score: $_totalScore/100',
                     style: TextStyle(
                       color: Colors.white,
-                      fontSize: 36.0,
+                      fontSize: getRelativeSize(context, 11.5),
                       fontWeight: FontWeight.bold,
                     ),
                     textAlign: TextAlign.center,
@@ -6818,7 +6850,7 @@ class _questionpageState extends State<questionpage> {
                               'Play again',
                               style: new TextStyle(
                                   color: Colors.black,
-                                  fontSize: 40.0,
+                                  fontSize: getRelativeSize(context, 12),
                                   fontWeight: FontWeight.bold),
                             ),
                             color: Colors.amberAccent,
@@ -6847,7 +6879,7 @@ class _questionpageState extends State<questionpage> {
                               'Main menu',
                               style: new TextStyle(
                                   color: Colors.black,
-                                  fontSize: 40.0,
+                                  fontSize: getRelativeSize(context, 12),
                                   fontWeight: FontWeight.bold),
                             ),
                             color: Colors.amberAccent,
@@ -7782,16 +7814,16 @@ class _questionpageState extends State<questionpage> {
 //    {
 //      'questionText': 'Το Ευρωπαϊκό Δικαστήριο:',
 //      'answers': [
-//        {'text': 'Μεσολαβεί εκ μέρους σας ενώπιον της αρχής κατά της οποίας υποβάλλετε παράπονο', 'score': 0},
+//        {'text': 'Μεσολαβεί εκ μέρους σας ενώπιον της αρχής κατά της οποίας υποβά��λετε παράπονο', 'score': 0},
 //        {'text': 'Σας βοηθά στην ανεύρεση ή πληρωμή δικηγόρου για τη σύνταξη της προσφυγής', 'score': 0},
-//        {'text': 'Δεν λειτουργεί ως εφετείο ως προς τα εθνικά δικαστήρια', 'score': 10},
+//        {'text': 'Δεν λειτουργεί ���� εφετείο ως προς τα εθνικά δικαστήρια', 'score': 10},
 //        {'text': 'Είναι αρμόδιο για την εκτέλεση των αποφάσεών του', 'score': 0},
 //      ],
 //    },
 //
 ////8.8
 //    {
-//      'questionText': 'Οι πολίτες μπορούν να υποβάλουν αναφορά για να καταγγείλουν κάθε παραβίαση του κοινοτικού δικαίου:',
+//      'questionText': 'Οι πολίτες μπορούν να υποβάλουν αναφορά για να καταγγείλουν κάθε παραβίαση του κοι��οτικού δικαίου:',
 //      'answers': [
 //        {'text': 'Στην Ισλαμική Διάσκεψη', 'score': 0},
 //        {'text': 'Στο Ευρωπαϊκό Κοινοβούλιο', 'score': 10},
@@ -8184,7 +8216,7 @@ class _questionpageState extends State<questionpage> {
 //              '$resultPhrase',
 //              style: TextStyle(
 //                color: Colors.white,
-//                fontSize: 44.0,
+//                fontSize: getRelativeSize(context, 12.5,
 //                fontWeight: FontWeight.bold,
 //              ),
 //              textAlign: TextAlign.center,
@@ -8193,7 +8225,7 @@ class _questionpageState extends State<questionpage> {
 //              'Total score: $_totalScore/100',
 //              style: TextStyle(
 //                color: Colors.white,
-//                fontSize: 36.0,
+//                fontSize: getRelativeSize(context, 11.5,
 //                fontWeight: FontWeight.bold,
 //              ),
 //              textAlign: TextAlign.center,
@@ -8218,7 +8250,7 @@ class _questionpageState extends State<questionpage> {
 //                        'Play Again',
 //                        style: new TextStyle(
 //                            color: Colors.black,
-//                            fontSize: 40.0,
+//                            fontSize: getRelativeSize(context, 12,
 //                            fontWeight: FontWeight.bold),
 //                      ),
 //                      color: Colors.amberAccent,
@@ -8247,7 +8279,7 @@ class _questionpageState extends State<questionpage> {
 //                        'Main Menu',
 //                        style: new TextStyle(
 //                            color: Colors.black,
-//                            fontSize: 40.0,
+//                            fontSize: getRelativeSize(context, 12,
 //                            fontWeight: FontWeight.bold),
 //                      ),
 //                      color: Colors.amberAccent,
