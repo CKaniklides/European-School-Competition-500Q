@@ -1,9 +1,9 @@
 import 'dart:async';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:european_school_competition_ck/start.dart';
 import 'package:flutter/services.dart';
 
+import 'start.dart';
 
 class splashscreen extends StatefulWidget {
   @override
@@ -11,7 +11,6 @@ class splashscreen extends StatefulWidget {
 }
 
 class _splashscreenState extends State<splashscreen> {
-
   @override
   // TODO: implement contexts
   BuildContext get context => super.context;
@@ -26,18 +25,16 @@ class _splashscreenState extends State<splashscreen> {
 
   @override
   Widget build(BuildContext context) {
-    SystemChrome.setPreferredOrientations([
-      DeviceOrientation.portraitDown, DeviceOrientation.portraitUp
-    ]);
+    SystemChrome.setPreferredOrientations(
+        [DeviceOrientation.portraitDown, DeviceOrientation.portraitUp]);
     return Scaffold(
         body: Container(
-          decoration: BoxDecoration(
-            image: DecorationImage(
-              image: AssetImage('assets/splash_image.jpg'),
-              fit: BoxFit.cover,
-            ),
-          ),
-        )
-    );
+      decoration: BoxDecoration(
+        image: DecorationImage(
+          image: AssetImage('assets/splash_image.jpg'),
+          fit: BoxFit.cover,
+        ),
+      ),
+    ));
   }
 }
